@@ -1,5 +1,6 @@
 # Dataset utils and dataloaders
 
+import pyautogui
 import glob
 import logging
 import math
@@ -301,16 +302,11 @@ class LoadStreams:  # multiple IP or RTSP cameras
             print('WARNING: Different stream shapes detected. For optimal performance supply similarly-shaped streams.')
 
     def update(self, index, cap):
-        # Read next stream frame in a daemon thread
-        n = 0
-        while cap.isOpened():
-            n += 1
-            # _, self.imgs[index] = cap.read()
-            cap.grab()
-            if n == 4:  # read every 4th frame
-                success, im = cap.retrieve()
-                self.imgs[index] = im if success else self.imgs[index] * 0
-                n = 0
+        while True:
+            frame = pyautogui.screenshot()
+            frame = np.array(frame)
+            frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+            self.imgs[index] = frame
             time.sleep(1 / self.fps)  # wait time
 
     def __iter__(self):
